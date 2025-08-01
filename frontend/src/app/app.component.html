@@ -1,0 +1,31 @@
+<div class="app-container">
+  <mat-toolbar color="primary" class="app-toolbar">
+    <mat-toolbar-row>
+      <span class="app-title">
+        <mat-icon>description</mat-icon>
+        {{ title }}
+      </span>
+      
+      <div class="nav-buttons">
+        <button mat-button 
+                [class.active]="currentView === 'upload'"
+                (click)="setView('upload')">
+          <mat-icon>cloud_upload</mat-icon>
+          Upload
+        </button>
+        
+        <button mat-button 
+                [class.active]="currentView === 'list'"
+                (click)="setView('list')">
+          <mat-icon>list</mat-icon>
+          Documents
+        </button>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <main class="main-content">
+    <app-document-upload *ngIf="currentView === 'upload'"></app-document-upload>
+    <app-document-list *ngIf="currentView === 'list'"></app-document-list>
+  </main>
+</div>

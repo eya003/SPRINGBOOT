@@ -1,0 +1,89 @@
+<div class="detail-container">
+  <div class="detail-header">
+    <h2 mat-dialog-title>{{ document.title }}</h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="detail-content">
+    <div class="document-info">
+      <div class="info-grid">
+        <div class="info-item">
+          <label>File Name:</label>
+          <span>{{ document.fileName }}</span>
+        </div>
+        
+        <div class="info-item">
+          <label>File Type:</label>
+          <span>{{ document.fileType }}</span>
+        </div>
+        
+        <div class="info-item">
+          <label>Status:</label>
+          <mat-chip [color]="document.status === 'COMPLETED' ? 'primary' : 'accent'">
+            {{ document.status }}
+          </mat-chip>
+        </div>
+        
+        <div class="info-item" *ngIf="document.confidenceScore">
+          <label>Confidence Score:</label>
+          <span class="confidence-score">
+            {{ (document.confidenceScore * 100) | number:'1.1-1' }}%
+          </span>
+        </div>
+        
+        <div class="info-item">
+          <label>Created:</label>
+          <span>{{ document.createdAt | date:'medium' }}</span>
+        </div>
+        
+        <div class="info-item" *ngIf="document.updatedAt">
+          <label>Updated:</label>
+          <span>{{ document.updatedAt | date:'medium' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <h3>Document Category</h3>
+      <div class="category-controls">
+        <mat-form-field appearance="outline">
+          <mat-label>Category</mat-label>
+          <mat-select [(value)]="selectedCategory">
+            <mat-option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <div class="category-actions">
+          <button mat-raised-button 
+                  color="primary" 
+                  (click)="updateCategory()"
+                  [disabled]="selectedCategory === document.category">
+            Update Category
+          </button>
+          
+          <button mat-raised-button 
+                  color="accent" 
+                  (click)="classifyDocument()">
+            <mat-icon>auto_awesome</mat-icon>
+            Auto Classify
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h3>Document Content</h3>
+      <div class="content-preview">
+        <pre>{{ document.content }}</pre>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="detail-actions">
+    <button mat-button (click)="onClose()">Close</button>
+  </mat-dialog-actions>
+</div>

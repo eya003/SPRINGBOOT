@@ -1,0 +1,136 @@
+<div class="list-container">
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <div class="filters">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <input matInput 
+                 [(ngModel)]="searchTerm" 
+                 (ngModelChange)="onSearchChange()"
+                 placeholder="Search documents...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Category</mat-label>
+          <mat-select [(value)]="selectedCategory" (selectionChange)="onCategoryChange()">
+            <mat-option value="ALL">All Categories</mat-option>
+            <mat-option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select [(value)]="selectedStatus" (selectionChange)="onStatusChange()">
+            <mat-option value="ALL">All Statuses</mat-option>
+            <mat-option *ngFor="let status of statuses" [value]="status">
+              {{ status }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="loadDocuments()">
+          <mat-icon>refresh</mat-icon>
+          Refresh
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Documents</mat-card-title>
+      <mat-card-subtitle>{{ filteredDocuments.length }} documents found</mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner></mat-spinner>
+        <p>Loading documents...</p>
+      </div>
+
+      <table mat-table [dataSource]="filteredDocuments" class="documents-table" *ngIf="!isLoading">
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let document">{{ document.title }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fileName">
+          <th mat-header-cell *matHeaderCellDef>File Name</th>
+          <td mat-cell *matCellDef="let document">{{ document.fileName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef>Category</th>
+          <td mat-cell *matCellDef="let document">
+            <mat-chip *ngIf="document.category" 
+                     [color]="getCategoryColor(document.category)">
+              {{ document.category }}
+            </mat-chip>
+            <span *ngIf="!document.category" class="no-category">Not classified</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let document">
+            <mat-chip [color]="getStatusColor(document.status!)">
+              {{ document.status }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="confidenceScore">
+          <th mat-header-cell *matHeaderCellDef>Confidence</th>
+          <td mat-cell *matCellDef="let document">
+            <span *ngIf="document.confidenceScore" class="confidence-score">
+              {{ (document.confidenceScore * 100) | number:'1.1-1' }}%
+            </span>
+            <span *ngIf="!document.confidenceScore">-</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Created</th>
+          <td mat-cell *matCellDef="let document">
+            {{ document.createdAt | date:'short' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let document">
+            <button mat-icon-button 
+                    (click)="viewDocument(document)"
+                    matTooltip="View Details">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    (click)="classifyDocument(document)"
+                    matTooltip="Classify Document"
+                    [disabled]="document.status === 'PROCESSING'">
+              <mat-icon>auto_awesome</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    (click)="deleteDocument(document)"
+                    matTooltip="Delete Document"
+                    color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div *ngIf="!isLoading && filteredDocuments.length === 0" class="no-documents">
+        <mat-icon>description</mat-icon>
+        <p>No documents found</p>
+        <p class="subtitle">Upload your first document to get started</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
